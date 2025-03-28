@@ -5,7 +5,7 @@ import Diary from "./pages/Diary";
 import New from "./pages/New";
 import Notfound from "./pages/Notfound";
 import Edit from "./pages/Edit";
-import { createContext, useEffect, useReducer, useRef } from "react";
+import { createContext, useEffect, useReducer, useRef, useState } from "react";
 
 // const mockData = [
 //   {
@@ -60,17 +60,21 @@ export const DiaryStateContext = createContext();
 export const DiaryDispatchContext = createContext();
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
   const [data, dispatch] = useReducer(reducer, []);
-  const idRef = useRef(0);
+  const idRef = useRef(1);
 
   useEffect(() => {
     const storedData = localStorage.getItem("diary");
     if (!storedData) {
+      setIsLoading(false);
       return;
     }
 
     const parsedData = JSON.parse(storedData);
     if (!Array.isArray(parsedData)) {
+      setIsLoading(false);
       return;
     }
 
@@ -87,6 +91,7 @@ function App() {
       type: "INIT",
       data: parsedData,
     });
+    setIsLoading(false);
   }, []);
 
   // 새로운 일기 추가
@@ -118,6 +123,9 @@ function App() {
       id,
     });
   };
+  if (isLoading) {
+    return <div>데이터 로딩중입니다 ...</div>;
+  }
 
   return (
     <>
